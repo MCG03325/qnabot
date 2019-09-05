@@ -19,6 +19,8 @@ namespace Microsoft.BotBuilderSamples
         private readonly ILogger<QnABot> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
 
+        private bool _regularChatEnabled = true;
+
         public QnABot(IConfiguration configuration, ILogger<QnABot> logger, IHttpClientFactory httpClientFactory)
         {
             _configuration = configuration;
@@ -27,6 +29,7 @@ namespace Microsoft.BotBuilderSamples
         }
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
+            _regularChatEnabled = false;
             var reply = MessageFactory.Text("Hello, how can I help you today? Type in any question below, or choose from one of the following prompts:");
 
             reply.SuggestedActions = new SuggestedActions()
@@ -45,50 +48,53 @@ namespace Microsoft.BotBuilderSamples
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            var httpClient = _httpClientFactory.CreateClient();
-
-            var qnaMaker = new QnAMaker(new QnAMakerEndpoint
+            if (_regularChatEnabled)
             {
-                KnowledgeBaseId = _configuration["QnAKnowledgebaseId"],
-                EndpointKey = _configuration["QnAAuthKey"],
-                Host = GetHostname()
-            },
-            null,
-            httpClient);
+                var httpClient = _httpClientFactory.CreateClient();
 
-            _logger.LogInformation("Calling QnA Maker");
-
-            // The actual call to the QnA Maker service.
-            var response = await qnaMaker.GetAnswersAsync(turnContext);
-            if (response != null && response.Length > 0)
-            {
-
-                await turnContext.SendActivityAsync(MessageFactory.Text(response[0].Answer), cancellationToken);
-                
-
-                /* Needs work
-                var reply = MessageFactory.Text("Did this answer your question?");
-
-                reply.SuggestedActions = new SuggestedActions()
+                var qnaMaker = new QnAMaker(new QnAMakerEndpoint
                 {
-                    Actions = new List<CardAction>()
+                    KnowledgeBaseId = _configuration["QnAKnowledgebaseId"],
+                    EndpointKey = _configuration["QnAAuthKey"],
+                    Host = GetHostname()
+                },
+                null,
+                httpClient);
+
+                _logger.LogInformation("Calling QnA Maker");
+
+                // The actual call to the QnA Maker service.
+                var response = await qnaMaker.GetAnswersAsync(turnContext);
+                if (response != null && response.Length > 0)
+                {
+
+                    await turnContext.SendActivityAsync(MessageFactory.Text(response[0].Answer), cancellationToken);
+
+
+                    /* Needs work
+                    var reply = MessageFactory.Text("Did this answer your question?");
+
+                    reply.SuggestedActions = new SuggestedActions()
                     {
-                        new CardAction() { Title = "Yes", Type = ActionTypes.ImBack, Value = "Yes, that answered my question." },
-                        new CardAction() { Title = "No", Type = ActionTypes.ImBack, Value = "No, I need more help." },
-                    },
-                };
+                        Actions = new List<CardAction>()
+                        {
+                            new CardAction() { Title = "Yes", Type = ActionTypes.ImBack, Value = "Yes, that answered my question." },
+                            new CardAction() { Title = "No", Type = ActionTypes.ImBack, Value = "No, I need more help." },
+                        },
+                    };
                 
-                if (turnContext.Activity.Text == "I need more help")
-                {
-                    var reply = MessageFactory.Text("Tell me your issue");
+                    if (turnContext.Activity.Text == "I need more help")
+                    {
+                        var reply = MessageFactory.Text("Tell me your issue");
+                        await turnContext.SendActivityAsync(reply, cancellationToken);
+                    }
                     await turnContext.SendActivityAsync(reply, cancellationToken);
+                    */
                 }
-                await turnContext.SendActivityAsync(reply, cancellationToken);
-                */
-            }
-            else
-            {
-                await turnContext.SendActivityAsync(MessageFactory.Text("I'm not sure how to answer that question. Call your Practice Support Advisor (PSA) for access to Hill inSite or for any issues with the automated questionnaire."), cancellationToken);
+                else
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text("I'm not sure how to answer that question. Call your Practice Support Advisor (PSA) for access to Hill inSite or for any issues with the automated questionnaire."), cancellationToken);
+                }
             }
         }
 
