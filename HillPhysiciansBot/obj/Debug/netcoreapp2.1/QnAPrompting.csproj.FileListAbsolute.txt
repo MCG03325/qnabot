@@ -1,0 +1,14 @@
+C:\Users\MCG03325\Desktop\Resources\SampleBot-src\qnamaker-prompting\csharp_dotnetcore\bin\Debug\netcoreapp2.1\QnAPrompting.deps.json
+C:\Users\MCG03325\Desktop\Resources\SampleBot-src\qnamaker-prompting\csharp_dotnetcore\bin\Debug\netcoreapp2.1\QnAPrompting.runtimeconfig.json
+C:\Users\MCG03325\Desktop\Resources\SampleBot-src\qnamaker-prompting\csharp_dotnetcore\bin\Debug\netcoreapp2.1\QnAPrompting.runtimeconfig.dev.json
+C:\Users\MCG03325\Desktop\Resources\SampleBot-src\qnamaker-prompting\csharp_dotnetcore\bin\Debug\netcoreapp2.1\QnAPrompting.dll
+C:\Users\MCG03325\Desktop\Resources\SampleBot-src\qnamaker-prompting\csharp_dotnetcore\bin\Debug\netcoreapp2.1\QnAPrompting.pdb
+C:\Users\MCG03325\Desktop\Resources\SampleBot-src\qnamaker-prompting\csharp_dotnetcore\obj\Debug\netcoreapp2.1\QnAPrompting.csprojAssemblyReference.cache
+C:\Users\MCG03325\Desktop\Resources\SampleBot-src\qnamaker-prompting\csharp_dotnetcore\obj\Debug\netcoreapp2.1\QnAPrompting.csproj.CoreCompileInputs.cache
+C:\Users\MCG03325\Desktop\Resources\SampleBot-src\qnamaker-prompting\csharp_dotnetcore\obj\Debug\netcoreapp2.1\QnAPrompting.RazorAssemblyInfo.cache
+C:\Users\MCG03325\Desktop\Resources\SampleBot-src\qnamaker-prompting\csharp_dotnetcore\obj\Debug\netcoreapp2.1\QnAPrompting.RazorAssemblyInfo.cs
+C:\Users\MCG03325\Desktop\Resources\SampleBot-src\qnamaker-prompting\csharp_dotnetcore\obj\Debug\netcoreapp2.1\QnAPrompting.AssemblyInfoInputs.cache
+C:\Users\MCG03325\Desktop\Resources\SampleBot-src\qnamaker-prompting\csharp_dotnetcore\obj\Debug\netcoreapp2.1\QnAPrompting.AssemblyInfo.cs
+C:\Users\MCG03325\Desktop\Resources\SampleBot-src\qnamaker-prompting\csharp_dotnetcore\obj\Debug\netcoreapp2.1\QnAPrompting.RazorTargetAssemblyInfo.cache
+C:\Users\MCG03325\Desktop\Resources\SampleBot-src\qnamaker-prompting\csharp_dotnetcore\obj\Debug\netcoreapp2.1\QnAPrompting.dll
+C:\Users\MCG03325\Desktop\Resources\SampleBot-src\qnamaker-prompting\csharp_dotnetcore\obj\Debug\netcoreapp2.1\QnAPrompting.pdb
