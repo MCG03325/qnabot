@@ -1,65 +1,64 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en-US">
 <head>
-    <link href="https://cdn.botframework.com/botframework-webchat/0.11.4/botchat.css" rel="stylesheet" />
+    <title>Web Chat: Send welcome event</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--
+      This CDN points to the latest official release of Web Chat. If you need to test against Web Chat's latest bits, please refer to pointing to Web Chat's MyGet feed:
+      https://github.com/microsoft/BotFramework-WebChat#how-to-test-with-web-chats-latest-bits
+    -->
+    <script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
     <style>
+        html, body {
+            height: 100%
+        }
+
+        body {
+            margin: 0
+        }
+
         #webchat {
             height: 100%;
             width: 100%;
         }
     </style>
-
 </head>
 <body>
-    <div style="display: flex">
-        <div style="position: relative; height: 500px; width: 500px"><div id="bot"></div></div>
-    </div>
-
-
-    <script src="https://cdn.botframework.com/botframework-webchat/0.11.4/botchat.js"></script>
-
+    <div id="webchat"></div>
     <script>
+      (async function () {
+        // In this demo, we are using Direct Line token from MockBot.
+        // Your client code must provide either a secret or a token to talk to your bot.
+        // Tokens are more secure. To learn about the differences between secrets and tokens
+        // and to understand the risks associated with using secrets, visit https://docs.microsoft.com/en-us/azure/bot-service/rest-api/bot-framework-rest-direct-line-3-0-authentication?view=azure-bot-service-4.0
 
-      (async function() {
+        const res = await fetch('https://webchat-mockbot.azurewebsites.net/directline/token', { method: 'POST' });
+        const { token } = await res.json();
 
-        const res = await fetch('/directline/token', { method: 'POST' });
-        const { token }  = await res.json();
-
-        var userinfo = {
-              id: 'user-id',
-              name: 'user name',
-              locale: 'es'
-          };
-
-        var botConnection = new window.BotChat.DirectLine({ token });
-
-        botConnection.connectionStatus$
-          .subscribe(connectionStatus => {
-              switch(connectionStatus) {
-                  case window.BotChat.ConnectionStatus.Online:
-                    botConnection.postActivity({
-                        from: { id: 'myUserId', name: 'myUserName' },
-                        type: 'event',
-                        name: 'webchat/join',
-                        value: { locale: 'en-US' }
-                    }).subscribe(
-                        id => console.log("Posted welcome event, assigned ID ", id),
-                        error => console.log("Error posting activity", error)
-                    );
-                    break;
+        // We are using a customized store to add hooks to connect event
+        const store = window.WebChat.createStore({}, ({ dispatch }) => next => action => {
+          if (action.type === 'DIRECT_LINE/CONNECT_FULFILLED') {
+            // When we receive DIRECT_LINE/CONNECT_FULFILLED action, we will send an event activity using WEB_CHAT/SEND_EVENT
+            dispatch({
+              type: 'WEB_CHAT/SEND_EVENT',
+              payload: {
+                name: 'webchat/join',
+                value: { language: window.navigator.language }
               }
-          });
+            });
+          }
 
+          return next(action);
+        });
 
-        BotChat.App({
-          botConnection: botConnection,
-          user: userinfo,
-          bot: { id: 'botid' },
-          resize: 'detect'
-        }, document.getElementById("bot"));
+        window.WebChat.renderWebChat({
+          directLine: window.WebChat.createDirectLine({ token }),
+          store
+        }, document.getElementById('webchat'));
 
-      })().catch(err => console.log(err));
-
+        document.querySelector('#webchat > *').focus();
+      })().catch(err => console.error(err));
     </script>
 </body>
 </html>

@@ -10,6 +10,9 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using Microsoft.Bot.Connector;
+using System;
+
 
 namespace Microsoft.BotBuilderSamples
 {
@@ -18,42 +21,41 @@ namespace Microsoft.BotBuilderSamples
         private readonly IConfiguration _configuration;
         private readonly ILogger<QnABot> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly List<String> ehrNames = new List<String>{ "Cerner" , "Elation Health", "Kareo", "Meditab Software, Inc.",
+                            "Office Ally", "System Physician’s Computer Company (PCC)", "Practice Fusion",
+                            "Quest – Quanum", "AdvancedMD", "AllScripts", "Amazing Charts", "AthenaHealth", "Chart Logic",
+                            "eClinicalWorks", "e-MDs", "GE Centricity", "MediTouch", "HealthFusion","IMS","MEDITECH",
+                            "Office Practicum", "Origins"}; //hardcoded, grab info from KB
+
+        private List<CardAction> ehrStepPrompts = new List<CardAction>();
+        private List<CardAction> ehrContactPrompts = new List<CardAction>();
 
         public QnABot(IConfiguration configuration, ILogger<QnABot> logger, IHttpClientFactory httpClientFactory)
         {
             _configuration = configuration;
             _logger = logger;
             _httpClientFactory = httpClientFactory;
+
+            //LoadEhrStepPrompts();
+            //LoadEhrContactPrompts();
         }
 
+        
+        protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
+        {
+            await OpenMenu(turnContext, cancellationToken);
+        }
         protected override async Task OnEventActivityAsync(ITurnContext<IEventActivity> turnContext, CancellationToken cancellationToken)
         {
             if (turnContext.Activity.Name == "webchat/join")
             {
-                await turnContext.SendActivityAsync("Welcome!");
+                await turnContext.SendActivityAsync("Welcome Message!");
             }
-        }
-
-        protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
-        {
-            var reply = MessageFactory.Text("Hello, how can I help you today? Type in any question below, or choose from one of the following prompts:");
-
-            reply.SuggestedActions = new SuggestedActions()
-            {
-                Actions = new List<CardAction>()
-                {
-                    new CardAction() { Title = "Purpose of this?", Type = ActionTypes.ImBack, Value = "Why do I have to do this?" },
-                    new CardAction() { Title = "Steps for e-measures", Type = ActionTypes.ImBack, Value = "Steps for e-measures" },
-                    new CardAction() { Title = "Troubleshoot", Type = ActionTypes.ImBack, Value = "Troubleshoot" },
-                },
-            };
-
-            await turnContext.SendActivityAsync(reply, cancellationToken);
-
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
+
             var httpClient = _httpClientFactory.CreateClient();
 
             var qnaMaker = new QnAMaker(new QnAMakerEndpoint
@@ -72,32 +74,87 @@ namespace Microsoft.BotBuilderSamples
             if (response != null && response.Length > 0)
             {
 
-                await turnContext.SendActivityAsync(MessageFactory.Text(response[0].Answer), cancellationToken);
-
-
-                /* Needs work
-                var reply = MessageFactory.Text("Did this answer your question?");
-
-                reply.SuggestedActions = new SuggestedActions()
+                if (isEHR(turnContext.Activity.Text))
                 {
-                    Actions = new List<CardAction>()
+                    
+                    await turnContext.SendActivityAsync(MessageFactory.Text(response[0].Answer), cancellationToken);
+
+                    var card = new HeroCard();
+
+                    card.Text = @"Were you able to obtain your e-measures?";
+                    card.Images = new List<CardImage>() { new CardImage("https://aka.ms/bf-welcome-card-image") };
+                    card.Buttons = new List<CardAction>()
                     {
-                        new CardAction() { Title = "Yes", Type = ActionTypes.ImBack, Value = "Yes, that answered my question." },
-                        new CardAction() { Title = "No", Type = ActionTypes.ImBack, Value = "No, I need more help." },
-                    },
-                };
-                
-                if (turnContext.Activity.Text == "I need more help")
+                        new CardAction() { Title = "Yes", Type = ActionTypes.ImBack, Value = "Yes, I completed the survey." },
+                        new CardAction() { Title = "No, I need more help from my EHR.", Type = ActionTypes.ImBack, Value = String.Format("I need more help from {0}.", turnContext.Activity.Text) },
+                        new CardAction() { Title = "No, I need steps for a different EHR.", Type = ActionTypes.ImBack, Value = "I need steps for a different EHR." },
+                        new CardAction() { Title = "Go back.", Type = ActionTypes.ImBack, Value = "Go back" },
+                    };
+
+                    var reply = MessageFactory.Attachment(card.ToAttachment());
+                    await turnContext.SendActivityAsync(reply, cancellationToken);
+
+                }
+                else if (turnContext.Activity.Text == "MENU" || turnContext.Activity.Text == "Go back")
                 {
-                    var reply = MessageFactory.Text("Tell me your issue");
+                    await OpenMenu(turnContext, cancellationToken);
+                }
+                else if (turnContext.Activity.Text == "FAQ")
+                {
+                    var card = new HeroCard();
+
+                    card.Text = @"Call your Practice Support Advisor(PSA) for access to Hill inSite or for any issues with the automated questionnaire. Or go back to the Main Menu.";
+                    card.Images = new List<CardImage>() { new CardImage("https://aka.ms/bf-welcome-card-image") };
+                    card.Buttons = new List<CardAction>()
+                    {
+                        new CardAction() { Title = "How do I access the questionnaire?", Type = ActionTypes.ImBack, Value = "How do I access the questionnaire?" },
+                        new CardAction() { Title = "What is the deadline to complete the questionnaire? ", Type = ActionTypes.ImBack, Value = "What is the deadline to complete the questionnaire? " },
+                        new CardAction() { Title = "Why is this information requested?", Type = ActionTypes.ImBack, Value = "Why is this information requested?" },
+                        new CardAction() { Title = "What are the two e-Measures?", Type = ActionTypes.ImBack, Value = "What are the two e-Measures?" },
+                        new CardAction() { Title = "For which measurement year is the e-Measure data being requested?", Type = ActionTypes.ImBack, Value = "For which measurement year is the e-Measure data being requested?" },
+                        new CardAction() { Title = "Who may complete the form? ", Type = ActionTypes.ImBack, Value = "Who may complete the form? " },
+                        new CardAction() { Title = "Does the form have to be completed once per provider?", Type = ActionTypes.ImBack, Value = "Does the form have to be completed once per provider?" },
+                        new CardAction() { Title = "Is this information collected only for Hill Physicians’ members?", Type = ActionTypes.ImBack, Value = "Is this information collected only for Hill Physicians’ members?" },
+                        new CardAction() { Title = "Is performance based on the number of compliant patients?", Type = ActionTypes.ImBack, Value = "Is performance based on the number of compliant patients?" },
+                        new CardAction() { Title = "Why do I have to complete this form every year?", Type = ActionTypes.ImBack, Value = "Why do I have to complete this form every year?" },
+
+                    };
+
+                    var reply = MessageFactory.Attachment(card.ToAttachment());
                     await turnContext.SendActivityAsync(reply, cancellationToken);
                 }
-                await turnContext.SendActivityAsync(reply, cancellationToken);
-                */
+                else if (turnContext.Activity.Text.Contains("more help")) //FIX
+                {
+                    var card = new HeroCard();
+
+                    card.Text = @"Call your Practice Support Advisor(PSA) for access to Hill inSite or for any issues with the automated questionnaire. Or go back to the Main Menu.";
+                    card.Images = new List<CardImage>() { new CardImage("https://aka.ms/bf-welcome-card-image") };
+                    card.Buttons = new List<CardAction>()
+                    {
+                        new CardAction() { Title = "Go back.", Type = ActionTypes.ImBack, Value = "Go back" },
+                    };
+
+                    var reply = MessageFactory.Attachment(card.ToAttachment());
+                    await turnContext.SendActivityAsync(reply, cancellationToken);
+                }
+                else
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text(response[0].Answer), cancellationToken);
+                }                
             }
             else
             {
-                await turnContext.SendActivityAsync(MessageFactory.Text("I'm not sure how to answer that question. Call your Practice Support Advisor (PSA) for access to Hill inSite or for any issues with the automated questionnaire."), cancellationToken);
+                var card = new HeroCard();
+
+                card.Text = @"I'm not sure how to answer that question. Call your Practice Support Advisor(PSA) for access to Hill inSite or for any issues with the automated questionnaire. Or go back to the Main Menu.";
+                card.Images = new List<CardImage>() { new CardImage("https://aka.ms/bf-welcome-card-image") };
+                card.Buttons = new List<CardAction>()
+                    {
+                        new CardAction() { Title = "Go back.", Type = ActionTypes.ImBack, Value = "Go back" },
+                    };
+
+                var reply = MessageFactory.Attachment(card.ToAttachment());
+                await turnContext.SendActivityAsync(reply, cancellationToken);
             }
             
         }
@@ -117,6 +174,52 @@ namespace Microsoft.BotBuilderSamples
 
             return hostname;
         }
+
+        private void LoadEhrStepPrompts()
+        {
+            foreach (String name in ehrNames)
+            {
+                ehrStepPrompts.Add(new CardAction() { Title = String.Format("{0}", name), Type = ActionTypes.ImBack, Value = String.Format("Steps for {0}", name) });
+            }
+        }
+        private void LoadEhrContactPrompts()
+        {
+            foreach (String name in ehrNames)
+            {
+                ehrContactPrompts.Add(new CardAction() { Title = String.Format("{0}", name), Type = ActionTypes.ImBack, Value = String.Format("Contact {0}", name) });
+            }
+        }
+
+        private bool isEHR(String reply)
+        {
+            reply = reply.ToLower();
+            foreach (String ehr in ehrNames)
+            {
+                String ehrLow = ehr.ToLower();
+                if (ehrLow.Contains(reply) || reply.Contains(ehrLow))
+                    return true;
+            }
+            return false;
+        }
+
+        private static async Task OpenMenu(ITurnContext turnContext, CancellationToken cancellationToken)
+        {
+            var card = new HeroCard();
+            card.Title = "Welcome to the e-Measure Survey Chatbot!";
+            card.Text = @"How can I help you today? Type in any question below, or choose from one of the following prompts:";
+            card.Images = new List<CardImage>() { new CardImage("https://aka.ms/bf-welcome-card-image") };
+            card.Buttons = new List<CardAction>()
+            {
+                new CardAction() { Title = "Steps for e-measures", Type = ActionTypes.ImBack, Value = "Steps for e-measures" },
+                //new CardAction() { Title = "Contact my EHR", Type = ActionTypes.ImBack, Value = "Contact my EHR" },
+                new CardAction() { Title = "FAQ", Type = ActionTypes.ImBack, Value = "FAQ" },
+                new CardAction() { Title = "Troubleshoot", Type = ActionTypes.ImBack, Value = "Troubleshoot" },
+            };
+
+            var response = MessageFactory.Attachment(card.ToAttachment());
+            await turnContext.SendActivityAsync(response, cancellationToken);
+        }
+
 
     }
 }
