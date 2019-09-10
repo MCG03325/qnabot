@@ -82,13 +82,12 @@ namespace Microsoft.BotBuilderSamples
                     var card = new HeroCard();
 
                     card.Text = @"Were you able to obtain your e-measures?";
-                    card.Images = new List<CardImage>() { new CardImage("https://aka.ms/bf-welcome-card-image") };
                     card.Buttons = new List<CardAction>()
                     {
                         new CardAction() { Title = "Yes", Type = ActionTypes.ImBack, Value = "Yes, I completed the survey." },
-                        new CardAction() { Title = "No, I need more help from my EHR.", Type = ActionTypes.ImBack, Value = String.Format("I need more help from {0}.", turnContext.Activity.Text) },
-                        new CardAction() { Title = "No, I need steps for a different EHR.", Type = ActionTypes.ImBack, Value = "I need steps for a different EHR." },
-                        new CardAction() { Title = "Go back.", Type = ActionTypes.ImBack, Value = "Go back" },
+                        new CardAction() { Title = "No, I need more help\n from my EHR", Type = ActionTypes.ImBack, Value = String.Format("I need more help from {0}.", turnContext.Activity.Text) },
+                        new CardAction() { Title = "No, I need steps for\n a different EHR", Type = ActionTypes.ImBack, Value = "I need steps for a different EHR." },
+                        new CardAction() { Title = "Go back", Type = ActionTypes.ImBack, Value = "Go back" },
                     };
 
                     var reply = MessageFactory.Attachment(card.ToAttachment());
@@ -104,20 +103,19 @@ namespace Microsoft.BotBuilderSamples
                     var card = new HeroCard();
 
                     card.Text = @"Call your Practice Support Advisor(PSA) for access to Hill inSite or for any issues with the automated questionnaire. Or go back to the Main Menu.";
-                    card.Images = new List<CardImage>() { new CardImage("https://aka.ms/bf-welcome-card-image") };
                     card.Buttons = new List<CardAction>()
                     {
-                        new CardAction() { Title = "How do I access the questionnaire?", Type = ActionTypes.ImBack, Value = "How do I access the questionnaire?" },
-                        new CardAction() { Title = "What is the deadline to complete the questionnaire? ", Type = ActionTypes.ImBack, Value = "What is the deadline to complete the questionnaire? " },
-                        new CardAction() { Title = "Why is this information requested?", Type = ActionTypes.ImBack, Value = "Why is this information requested?" },
-                        new CardAction() { Title = "What are the two e-Measures?", Type = ActionTypes.ImBack, Value = "What are the two e-Measures?" },
-                        new CardAction() { Title = "For which measurement year is the e-Measure data being requested?", Type = ActionTypes.ImBack, Value = "For which measurement year is the e-Measure data being requested?" },
-                        new CardAction() { Title = "Who may complete the form? ", Type = ActionTypes.ImBack, Value = "Who may complete the form? " },
-                        new CardAction() { Title = "Does the form have to be completed once per provider?", Type = ActionTypes.ImBack, Value = "Does the form have to be completed once per provider?" },
-                        new CardAction() { Title = "Is this information collected only for Hill Physicians’ members?", Type = ActionTypes.ImBack, Value = "Is this information collected only for Hill Physicians’ members?" },
-                        new CardAction() { Title = "Is performance based on the number of compliant patients?", Type = ActionTypes.ImBack, Value = "Is performance based on the number of compliant patients?" },
-                        new CardAction() { Title = "Why do I have to complete this form every year?", Type = ActionTypes.ImBack, Value = "Why do I have to complete this form every year?" },
-
+                        new CardAction() { Title = "How do I access the\n questionnaire?", Type = ActionTypes.ImBack, Value = "How do I access the questionnaire?" },
+                        new CardAction() { Title = "What is the deadline\n to complete the\n questionnaire? ", Type = ActionTypes.ImBack, Value = "What is the deadline to complete the questionnaire? " },
+                        new CardAction() { Title = "Why is this\n information requested?", Type = ActionTypes.ImBack, Value = "Why is this information requested?" },
+                        new CardAction() { Title = "What are the \n two e-Measures?", Type = ActionTypes.ImBack, Value = "What are the two e-Measures?" },
+                        new CardAction() { Title = "For which\n measurement year\n is the e-Measure \n data being requested?", Type = ActionTypes.ImBack, Value = "For which measurement year is the e-Measure data being requested?" },
+                        new CardAction() { Title = "Who may complete\n the form? ", Type = ActionTypes.ImBack, Value = "Who may complete the form? " },
+                        new CardAction() { Title = "Does the form have to\n be completed\n once per provider?", Type = ActionTypes.ImBack, Value = "Does the form have to be completed once per provider?" },
+                        new CardAction() { Title = "Is this information\n collected only\n for Hill\n Physicians’ members?", Type = ActionTypes.ImBack, Value = "Is this information collected only for Hill Physicians’ members?" },
+                        new CardAction() { Title = "Is performance based\n on the number\n of compliant\n patients?", Type = ActionTypes.ImBack, Value = "Is performance based on the number of compliant patients?" },
+                        new CardAction() { Title = "Why do I have to\n complete this\n form every year?", Type = ActionTypes.ImBack, Value = "Why do I have to complete this form every year?" },
+                        new CardAction() { Title = "Go back", Type = ActionTypes.ImBack, Value = "Go back" }
                     };
 
                     var reply = MessageFactory.Attachment(card.ToAttachment());
@@ -128,10 +126,9 @@ namespace Microsoft.BotBuilderSamples
                     var card = new HeroCard();
 
                     card.Text = @"Call your Practice Support Advisor(PSA) for access to Hill inSite or for any issues with the automated questionnaire. Or go back to the Main Menu.";
-                    card.Images = new List<CardImage>() { new CardImage("https://aka.ms/bf-welcome-card-image") };
                     card.Buttons = new List<CardAction>()
                     {
-                        new CardAction() { Title = "Go back.", Type = ActionTypes.ImBack, Value = "Go back" },
+                        new CardAction() { Title = "Go back", Type = ActionTypes.ImBack, Value = "Go back" },
                     };
 
                     var reply = MessageFactory.Attachment(card.ToAttachment());
@@ -147,11 +144,10 @@ namespace Microsoft.BotBuilderSamples
                 var card = new HeroCard();
 
                 card.Text = @"I'm not sure how to answer that question. Call your Practice Support Advisor(PSA) for access to Hill inSite or for any issues with the automated questionnaire. Or go back to the Main Menu.";
-                card.Images = new List<CardImage>() { new CardImage("https://aka.ms/bf-welcome-card-image") };
                 card.Buttons = new List<CardAction>()
-                    {
-                        new CardAction() { Title = "Go back.", Type = ActionTypes.ImBack, Value = "Go back" },
-                    };
+                {
+                        new CardAction() { Title = "Go back", Type = ActionTypes.ImBack, Value = "Go back" },
+                };
 
                 var reply = MessageFactory.Attachment(card.ToAttachment());
                 await turnContext.SendActivityAsync(reply, cancellationToken);
@@ -207,7 +203,6 @@ namespace Microsoft.BotBuilderSamples
             var card = new HeroCard();
             card.Title = "Welcome to the e-Measure Survey Chatbot!";
             card.Text = @"How can I help you today? Type in any question below, or choose from one of the following prompts:";
-            card.Images = new List<CardImage>() { new CardImage("https://aka.ms/bf-welcome-card-image") };
             card.Buttons = new List<CardAction>()
             {
                 new CardAction() { Title = "Steps for e-measures", Type = ActionTypes.ImBack, Value = "Steps for e-measures" },
