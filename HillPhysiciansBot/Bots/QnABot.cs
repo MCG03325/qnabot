@@ -201,7 +201,7 @@ namespace Microsoft.BotBuilderSamples
         private static async Task OpenMenu(ITurnContext turnContext, CancellationToken cancellationToken)
         {
             var card = new HeroCard();
-            card.Title = "Welcome to the e-Measure Survey Chatbot!";
+            card.Title = "Welcome to the e-Measure\n Survey Chatbot!";
             card.Text = @"How can I help you today? Type in any question below, or choose from one of the following prompts:";
             card.Buttons = new List<CardAction>()
             {
