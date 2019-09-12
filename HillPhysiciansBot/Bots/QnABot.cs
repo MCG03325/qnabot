@@ -22,8 +22,8 @@ namespace Microsoft.BotBuilderSamples
         private readonly ILogger<QnABot> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly List<String> ehrNames = new List<String>{ "Cerner" , "Elation Health", "Kareo", "Meditab Software, Inc.",
-                            "Office Ally", "System Physician’s Computer Company (PCC)", "Practice Fusion",
-                            "Quest – Quanum", "AdvancedMD", "AllScripts", "Amazing Charts", "AthenaHealth", "Chart Logic",
+                            "Office Ally", "System Physicianâ€™s Computer Company (PCC)", "Practice Fusion",
+                            "Quest â€“ Quanum", "AdvancedMD", "AllScripts", "Amazing Charts", "AthenaHealth", "Chart Logic",
                             "eClinicalWorks", "e-MDs", "GE Centricity", "MediTouch", "HealthFusion","IMS","MEDITECH",
                             "Office Practicum", "Origins"}; //hardcoded, grab info from KB
 
@@ -112,7 +112,7 @@ namespace Microsoft.BotBuilderSamples
                         new CardAction() { Title = "For which\n measurement year\n is the e-Measure \n data being requested?", Type = ActionTypes.ImBack, Value = "For which measurement year is the e-Measure data being requested?" },
                         new CardAction() { Title = "Who may complete\n the form? ", Type = ActionTypes.ImBack, Value = "Who may complete the form? " },
                         new CardAction() { Title = "Does the form have to\n be completed\n once per provider?", Type = ActionTypes.ImBack, Value = "Does the form have to be completed once per provider?" },
-                        new CardAction() { Title = "Is this information\n collected only\n for Hill\n Physicians’ members?", Type = ActionTypes.ImBack, Value = "Is this information collected only for Hill Physicians’ members?" },
+                        new CardAction() { Title = "Is this information\n collected only\n for Hill\n Physiciansâ€™ members?", Type = ActionTypes.ImBack, Value = "Is this information collected only for Hill Physiciansâ€™ members?" },
                         new CardAction() { Title = "Is performance based\n on the number\n of compliant\n patients?", Type = ActionTypes.ImBack, Value = "Is performance based on the number of compliant patients?" },
                         new CardAction() { Title = "Why do I have to\n complete this\n form every year?", Type = ActionTypes.ImBack, Value = "Why do I have to complete this form every year?" },
                         new CardAction() { Title = "Go back", Type = ActionTypes.ImBack, Value = "Go back" }
@@ -201,7 +201,7 @@ namespace Microsoft.BotBuilderSamples
         private static async Task OpenMenu(ITurnContext turnContext, CancellationToken cancellationToken)
         {
             var card = new HeroCard();
-            card.Title = "Welcome to the e-Measure\n Survey Chatbot!";
+            card.Title = "Welcome to the\n e-Measure Survey Chatbot!";
             card.Text = @"How can I help you today? Type in any question below, or choose from one of the following prompts:";
             card.Buttons = new List<CardAction>()
             {
